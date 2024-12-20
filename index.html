@@ -1,0 +1,1260 @@
+<html><head><base href=".">
+    <meta charset="UTF-8">
+    <title>3D Driving Game</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #speedometer {
+            position: fixed;
+            bottom: 20px;
+            right: 50px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        #instructions {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-family: Arial, sans-serif;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+            height: fit-content;
+        }
+        #toggleUI {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+        }
+        #toggleTraffic {
+            position: fixed;
+            top: 220px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+        }
+        #toggleTrees {
+            position: fixed;
+            top: 260px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+        }
+        #toggleHealth {
+            position: fixed;
+            top: 300px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+        }
+        #healthBar {
+            position: fixed;
+            top: 340px;
+            left: 20px;
+            width: 200px;
+            height: 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 5px;
+            display: none;
+        }
+        #healthFill {
+            width: 100%;
+            height: 100%;
+            background: #00ff00;
+            border-radius: 5px;
+            transition: width 0.3s;
+            position: relative;
+        }
+        #healthText {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            line-height: 20px;
+        }
+        #damageText {
+            position: fixed;
+            color: red;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-size: 24px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #mobileControls {
+            position: fixed;
+            bottom: 60px;
+            left: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, var(--button-size));
+            grid-template-rows: repeat(3, var(--button-size));
+            gap: 5px;
+            touch-action: none;
+        }
+    
+        .mobileButton {
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: 1px solid white;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            touch-action: manipulation;
+        }
+    
+        .mobileButton:active {
+            background: rgba(255,255,255,0.3);
+        }
+    
+        #controlsSize {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 100px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px;
+            border-radius: 5px;
+        }
+    
+        #controlsSizeLabel {
+            position: fixed;
+            bottom: 20px;
+            left: 130px;
+            color: white;
+            font-family: Arial, sans-serif;
+            background: rgba(0,0,0,0.5);
+            padding: 5px;
+            border-radius: 5px;
+        }
+    
+        #respawnUI {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            display: none;
+        }
+    
+        #respawnButton {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+    
+        #respawnButton:hover {
+            background: #ff6666;
+        }
+    
+        #achievementsButton {
+            position: fixed;
+            top: 180px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+        }
+    
+        #achievementsUI {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+            min-width: 300px;
+        }
+    
+        .achievement {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+    
+        .achievement img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+            filter: grayscale(100%);
+            opacity: 0.5;
+        }
+    
+        .achievement.unlocked img {
+            filter: none;
+            opacity: 1;
+        }
+    
+        .achievement-info {
+            flex-grow: 1;
+        }
+    
+        .achievement-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    
+        .achievement-desc {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+    
+        #closeAchievements {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    
+        #resetAchievements, #confirmReset {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            width: 100%;
+        }
+    
+        #resetAchievements:hover, #confirmReset:hover {
+            background: #ff6666;
+        }
+    
+        #confirmResetDialog {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,0,0,0.2);
+            border-radius: 5px;
+        }
+    
+        #achievementPopup {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-family: Arial, sans-serif;
+            transition: transform 0.3s;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+        }
+    
+        #achievementPopup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+    
+        #achievementPopup img {
+            width: 40px;
+            height: 40px;
+        }
+    
+        .achievement-popup-info {
+            display: flex;
+            flex-direction: column;
+        }
+    
+        .achievement-popup-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+    </head>
+    <body>
+    <div id="speedometer">Speed: 0 MPH</div>
+    <div id="instructions">
+        Controls:<br>
+        W/&#x2191; - Accelerate<br>
+        S/&#x2193; - Brake/Reverse<br>
+        A/&#x2190; - Turn Left<br>
+        D/&#x2192; - Turn Right<br>
+        Space - Handbrake<br>
+        R - Reset car back to street 
+    </div>
+    <div id="toggleUI">Toggle UI</div>
+    <div id="achievementsButton">Achievements</div>
+    <div id="toggleTraffic" style="position: fixed; top: 220px; left: 20px; background: rgba(0,0,0,0.5); color: white; padding: 10px; border-radius: 5px; cursor: pointer; font-family: Arial, sans-serif;">
+        Toggle Traffic: ON
+    </div>
+    <div id="toggleTrees" style="position: fixed; top: 260px; left: 20px; background: rgba(0,0,0,0.5); color: white; padding: 10px; border-radius: 5px; cursor: pointer; font-family: Arial, sans-serif;">
+        Toggle Trees: ON
+    </div>
+    <div id="toggleHealth">Toggle Health System: OFF</div>
+    <div id="healthBar"><div id="healthFill"><div id="healthText">100%</div></div></div>
+    <div id="damageText">Damage!</div>
+    <div id="mobileControls">
+        <div></div>
+        <div class="mobileButton" id="btnW">W</div>
+        <div></div>
+        <div class="mobileButton" id="btnA">A</div>
+        <div class="mobileButton" id="btnS">S</div>
+        <div class="mobileButton" id="btnD">D</div>
+        <div class="mobileButton" id="btnSpace">&#x23b5;</div>
+        <div></div>
+        <div class="mobileButton" id="btnR">R</div>
+    </div>
+    <input type="range" id="controlsSize" min="30" max="80" value="40">
+    <div id="controlsSizeLabel">Controls Size</div>
+    <div id="respawnUI">
+      <h2>Game Over!</h2>
+      <p>Your car was destroyed!</p>
+      <button id="respawnButton">Respawn</button>
+    </div>
+    <div id="achievementsUI">
+        <button id="closeAchievements">&#xd7;</button>
+        <h2>Achievements</h2>
+        <div class="achievement" id="howAchievement">
+            <img src="/1 hp car.png" alt="How?!">
+            <div class="achievement-info">
+                <div class="achievement-title">How?!</div>
+                <div class="achievement-desc">Get 1% health in health system mode for atleast 3 seconds!</div>
+            </div>
+        </div>
+        <button id="resetAchievements">Reset Achievements</button>
+        <div id="confirmResetDialog">
+            <p>Are you REALLY sure you want to reset all achievements?</p>
+            <button id="confirmReset">Yes, Reset Everything</button>
+        </div>
+    </div>
+    <div id="achievementPopup">
+        <img src="/1 hp car.png" alt="Achievement">
+        <div class="achievement-popup-info">
+            <div class="achievement-popup-title">Achievement Unlocked!</div>
+            <div class="achievement-popup-desc"></div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>document.documentElement.style.setProperty('--button-size', '40px');
+    let achievementTimer = null;
+    let startedAchievementTimer = false;
+    
+    const controlsSizeSlider = document.getElementById('controlsSize');
+    controlsSizeSlider.addEventListener('input', e => {
+      const size = e.target.value;
+      document.documentElement.style.setProperty('--button-size', size + 'px');
+    });
+    const scene = new THREE.Scene();
+    const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
+    const skyMaterial = new THREE.MeshBasicMaterial({
+      color: 0x87CEEB,
+      side: THREE.BackSide
+    });
+    const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+    scene.add(sky);
+    scene.background = new THREE.Color(0x87CEEB);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    const carGeometry = new THREE.BoxGeometry(2, 1, 4);
+    const carMaterial = new THREE.MeshPhongMaterial({
+      color: 0xff0000
+    });
+    const explosionParticles = [];
+    const car = new THREE.Mesh(carGeometry, carMaterial);
+    const wheelGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.3, 32);
+    const wheelMaterial = new THREE.MeshPhongMaterial({
+      color: 0x333333
+    });
+    const wheelFL = new THREE.Mesh(wheelGeometry, wheelMaterial);
+    const wheelFR = new THREE.Mesh(wheelGeometry, wheelMaterial);
+    const wheelBL = new THREE.Mesh(wheelGeometry, wheelMaterial);
+    const wheelBR = new THREE.Mesh(wheelGeometry, wheelMaterial);
+    wheelFL.position.set(-1.2, -0.3, 1.5);
+    wheelFR.position.set(1.2, -0.3, 1.5);
+    wheelBL.position.set(-1.2, -0.3, -1.5);
+    wheelBR.position.set(1.2, -0.3, -1.5);
+    wheelFL.rotation.z = Math.PI / 2;
+    wheelFR.rotation.z = Math.PI / 2;
+    wheelBL.rotation.z = Math.PI / 2;
+    wheelBR.rotation.z = Math.PI / 2;
+    car.add(wheelFL);
+    car.add(wheelFR);
+    car.add(wheelBL);
+    car.add(wheelBR);
+    const wheels = [wheelFL, wheelFR, wheelBL, wheelBR];
+    const frontWheels = [wheelFL, wheelFR];
+    const backWheels = [wheelBL, wheelBR];
+    car.geometry.computeBoundingBox();
+    scene.add(car);
+    car.userData.angularVelocity = new THREE.Vector3(0, 0, 0);
+    car.userData.inAir = false;
+    const treeSections = [];
+    const treesPerSection = 50;
+    function createTree(x, z) {
+      const trunkGeometry = new THREE.CylinderGeometry(0.4, 0.4, 4, 8);
+      const trunkMaterial = new THREE.MeshPhongMaterial({
+        color: 0x4d2926
+      });
+      const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+      const leavesGeometry = new THREE.ConeGeometry(3, 6, 8);
+      const leavesMaterial = new THREE.MeshPhongMaterial({
+        color: 0x0f5f13
+      });
+      const leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
+      leaves.position.y = 5;
+      const treeGroup = new THREE.Group();
+      treeGroup.add(trunk);
+      treeGroup.add(leaves);
+      treeGroup.position.set(x, 2, z);
+      const collisionBox = new THREE.Box3();
+      collisionBox.setFromObject(treeGroup);
+      treeGroup.userData.collisionBox = collisionBox;
+      return treeGroup;
+    }
+    function createTreesForSection(zPosition) {
+      const trees = [];
+      for (let i = 0; i < treesPerSection; i++) {
+        let x = Math.random() * 1000 - 500;
+        if (Math.abs(x) < 15) {
+          x = x > 0 ? x + 15 : x - 15;
+        }
+        const z = zPosition + Math.random() * sectionLength - sectionLength / 2;
+        const tree = createTree(x, z);
+        scene.add(tree);
+        trees.push(tree);
+      }
+      return trees;
+    }
+    const groundSections = [];
+    const sectionLength = 1000;
+    const numSections = 3;
+    function createGroundSection(zPosition) {
+      const groundGeometry = new THREE.PlaneGeometry(10000, sectionLength);
+      const groundMaterial = new THREE.MeshPhongMaterial({
+        color: 0x2d5a27,
+        side: THREE.DoubleSide
+      });
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.rotation.x = Math.PI / 2;
+      ground.position.z = zPosition;
+      scene.add(ground);
+      return ground;
+    }
+    const roadSections = [];
+    function createRoadSection(zPosition) {
+      const roadGeometry = new THREE.PlaneGeometry(20, sectionLength);
+      const roadMaterial = new THREE.MeshPhongMaterial({
+        color: 0x666666,
+        side: THREE.DoubleSide
+      });
+      const road = new THREE.Mesh(roadGeometry, roadMaterial);
+      road.rotation.x = Math.PI / 2;
+      road.position.y = 0.01;
+      road.position.z = zPosition;
+      scene.add(road);
+      return road;
+    }
+    for (let i = 0; i < numSections; i++) {
+      const zPos = (i - 1) * sectionLength;
+      groundSections.push(createGroundSection(zPos));
+      roadSections.push(createRoadSection(zPos));
+      treeSections.push(createTreesForSection(zPos));
+    }
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(100, 100, 0);
+    scene.add(directionalLight);
+    camera.position.set(0, 5, -10);
+    camera.lookAt(car.position);
+    let speed = 0;
+    const acceleration = 0.2;
+    const deceleration = 0.95;
+    const turnSpeed = 0.03;
+    let rotation = 0;
+    let velocityX = 0;
+    let velocityZ = 0;
+    let velocityY = 0;
+    const bounceCoefficient = 0.6;
+    const gravity = 0.05;
+    const maxRotationRate = 0.12;
+    const groundFriction = 0.98;
+    const groundWidth = 1000;
+    const keys = {
+      ArrowUp: false,
+      ArrowDown: false,
+      ArrowLeft: false,
+      ArrowRight: false,
+      w: false,
+      s: false,
+      a: false,
+      d: false,
+      ' ': false,
+      r: false
+    };
+    const mobileButtons = {
+      btnW: 'w',
+      btnA: 'a',
+      btnS: 's',
+      btnD: 'd',
+      btnSpace: ' ',
+      btnR: 'r'
+    };
+    Object.keys(mobileButtons).forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        btn.addEventListener('touchstart', e => {
+          e.preventDefault();
+          keys[mobileButtons[btnId]] = true;
+        });
+        btn.addEventListener('touchend', e => {
+          e.preventDefault();
+          keys[mobileButtons[btnId]] = false;
+        });
+        btn.addEventListener('mousedown', e => {
+          e.preventDefault();
+          keys[mobileButtons[btnId]] = true;
+        });
+        btn.addEventListener('mouseup', e => {
+          e.preventDefault();
+          keys[mobileButtons[btnId]] = false;
+        });
+        btn.addEventListener('mouseleave', e => {
+          e.preventDefault();
+          keys[mobileButtons[btnId]] = false;
+        });
+        btn.addEventListener('touchcancel', e => {
+          e.preventDefault();
+          keys[mobileButtons[btnId]] = false;
+        });
+      }
+    });
+    let trafficEnabled = true;
+    let treesEnabled = true;
+    let healthSystemEnabled = false;
+    let playerHealth = 100;
+    const healthBar = document.getElementById('healthBar');
+    const healthFill = document.getElementById('healthFill');
+    const toggleHealthButton = document.getElementById('toggleHealth');
+    toggleHealthButton.addEventListener('click', () => {
+      healthSystemEnabled = !healthSystemEnabled;
+      toggleHealthButton.textContent = `Toggle Health System: ${healthSystemEnabled ? 'ON' : 'OFF'}`;
+      healthBar.style.display = healthSystemEnabled ? 'block' : 'none';
+      if (healthSystemEnabled) {
+        playerHealth = 100;
+        updateHealthBar();
+      }
+    });
+    function updateHealthBar() {
+        const healthPercent = Math.round(playerHealth);
+        healthFill.style.width = `${healthPercent}%`;
+        healthFill.style.backgroundColor = `hsl(${healthPercent * 1.2}, 100%, 50%)`;
+        document.getElementById('healthText').textContent = `${healthPercent}%`;
+    }
+    function damagePlayer(amount) {
+        if (!healthSystemEnabled) return;
+        
+        const oldHealth = playerHealth;
+        playerHealth = Math.max(0, playerHealth - amount);
+        
+        // Make health bar more accurate
+        updateHealthBar();
+        
+        // Show damage text
+        const damageText = document.createElement('div');
+        damageText.id = 'damageText';
+        damageText.textContent = `-${Math.round(amount)}`;
+        damageText.style.left = `${healthBar.offsetLeft + 220}px`;
+        damageText.style.top = `${healthBar.offsetTop}px`;
+        document.body.appendChild(damageText);
+        
+        requestAnimationFrame(() => {
+            damageText.style.opacity = '1';
+            damageText.style.transform = 'translateY(-20px)';
+            setTimeout(() => {
+                damageText.style.opacity = '0';
+                setTimeout(() => damageText.remove(), 300);
+            }, 700);
+        });
+    
+        // Replace achievement check with timer logic
+        if (healthSystemEnabled && playerHealth <= 1 && playerHealth > 0) {
+            if (!startedAchievementTimer && !achievements.how) {
+                startedAchievementTimer = true;
+                achievementTimer = setTimeout(() => {
+                    if (playerHealth <= 1 && playerHealth > 0) {
+                        achievements.how = true;
+                        localStorage.setItem('achievements', JSON.stringify(achievements)); // Save after unlocking
+                        updateAchievementUI();
+                        
+                        // Show achievement popup
+                        const popupDesc = achievementPopup.querySelector('.achievement-popup-desc');
+                        popupDesc.textContent = "Get 1% health in health system mode for atleast 3 seconds!";
+                        achievementPopup.classList.add('show');
+                        
+                        setTimeout(() => {
+                            achievementPopup.classList.remove('show');
+                        }, 5000);
+                    }
+                    startedAchievementTimer = false;
+                }, 3000);
+            }
+        } else {
+            // Clear timer if health goes above 1%
+            if (achievementTimer) {
+                clearTimeout(achievementTimer);
+                achievementTimer = null;
+                startedAchievementTimer = false;
+            }
+        }
+    
+        // Check for game over
+        if (playerHealth <= 0) {
+            createExplosion(car.position);
+            isGameOver = true;
+            speed = 0;
+            velocityX = 0;
+            velocityY = 0;
+            velocityZ = 0;
+            document.getElementById('respawnUI').style.display = 'block';
+        }
+    }
+    const toggleButton = document.getElementById('toggleTraffic');
+    const toggleTreesButton = document.getElementById('toggleTrees');
+    const trafficCars = [];
+    const maxTrafficCars = 20;
+    function createTrafficCar() {
+      const carBody = new THREE.BoxGeometry(1.8, 1, 3.5);
+      const carMaterial = new THREE.MeshPhongMaterial({
+        color: new THREE.Color(`hsl(${Math.random() * 360}, 70%, 50%)`)
+      });
+      const trafficCar = new THREE.Mesh(carBody, carMaterial);
+      const wheelGeom = new THREE.CylinderGeometry(0.3, 0.3, 0.2, 32);
+      const wheelMat = new THREE.MeshPhongMaterial({
+        color: 0x333333
+      });
+      const wheels = [];
+      const wheelPositions = [[-0.9, -0.3, 1.2], [0.9, -0.3, 1.2], [-0.9, -0.3, -1.2], [0.9, -0.3, -1.2]];
+      wheelPositions.forEach(pos => {
+        const wheel = new THREE.Mesh(wheelGeom, wheelMat);
+        wheel.position.set(...pos);
+        wheel.rotation.z = Math.PI / 2;
+        trafficCar.add(wheel);
+        wheels.push(wheel);
+      });
+      const lane = Math.random() < 0.5 ? -7 : 7;
+      trafficCar.position.set(lane, 0.5, car.position.z + Math.random() * sectionLength * numSections);
+      trafficCar.rotation.y = lane > 0 ? Math.PI : 0;
+      trafficCar.userData = {
+        velocity: new THREE.Vector3(),
+        angularVelocity: new THREE.Vector3(),
+        speed: 0.3 + Math.random() * 0.3,
+        wheels,
+        isAICar: true,
+        hit: false,
+        inAir: false
+      };
+      scene.add(trafficCar);
+      trafficCars.push(trafficCar);
+      return trafficCar;
+    }
+    
+    function createBus() {
+      const busBody = new THREE.BoxGeometry(2.2, 2.5, 3.5); // Wider and much taller
+      const busMaterial = new THREE.MeshPhongMaterial({
+        color: 0xFFFF00 // Yellow color
+      });
+      const bus = new THREE.Mesh(busBody, busMaterial);
+    
+      // Add blue windows
+      const windowGeometry = new THREE.BoxGeometry(2.1, 1, 0.1);
+      const windowMaterial = new THREE.MeshPhongMaterial({
+        color: 0x4444FF,
+        transparent: true,
+        opacity: 0.6
+      });
+      
+      // Side windows
+      const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+      leftWindow.position.y = 0.5;
+      leftWindow.position.x = 0;
+      leftWindow.position.z = 0;
+      bus.add(leftWindow);
+    
+      const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+      rightWindow.position.y = 0.5;
+      rightWindow.position.x = 0;
+      rightWindow.position.z = 0;
+      bus.add(rightWindow);
+    
+      // Windshield
+      const windshieldGeometry = new THREE.BoxGeometry(2.1, 1, 0.1);
+      const windshield = new THREE.Mesh(windshieldGeometry, windowMaterial);
+      windshield.position.y = 0.5;
+      windshield.position.z = 1.7;
+      bus.add(windshield);
+    
+      // Add wheels like regular cars
+      const wheelGeom = new THREE.CylinderGeometry(0.3, 0.3, 0.2, 32);
+      const wheelMat = new THREE.MeshPhongMaterial({
+        color: 0x333333
+      });
+      const wheels = [];
+      const wheelPositions = [[-1.0, -1.1, 1.2], [1.0, -1.1, 1.2], [-1.0, -1.1, -1.2], [1.0, -1.1, -1.2]];
+      wheelPositions.forEach(pos => {
+        const wheel = new THREE.Mesh(wheelGeom, wheelMat);
+        wheel.position.set(...pos);
+        wheel.rotation.z = Math.PI / 2;
+        bus.add(wheel);
+        wheels.push(wheel);
+      });
+    
+      const lane = Math.random() < 0.5 ? -7 : 7;
+      bus.position.set(lane, 1.25, car.position.z + Math.random() * sectionLength * numSections);
+      bus.rotation.y = lane > 0 ? Math.PI : 0;
+      
+      bus.userData = {
+        velocity: new THREE.Vector3(),
+        angularVelocity: new THREE.Vector3(),
+        speed: 0.2 + Math.random() * 0.2, // Slightly slower than cars
+        wheels,
+        isAICar: true,
+        isBus: true,
+        hit: false,
+        inAir: false,
+        mass: 2.5 // Add mass property - buses are heavier
+      };
+    
+      scene.add(bus);
+      trafficCars.push(bus); // Add to same array as cars
+      return bus;
+    }
+    
+    // Modify createTrafficCar() call in updateTrafficCars()
+    function updateTrafficCars() {
+      if (!trafficEnabled) return;
+      for (let i = trafficCars.length - 1; i >= 0; i--) {
+        const trafficCar = trafficCars[i];
+        if (Math.abs(trafficCar.position.z - car.position.z) > sectionLength * 2 || trafficCar.position.y < -50) {
+          scene.remove(trafficCar);
+          trafficCars.splice(i, 1);
+        }
+      }
+      while (trafficCars.length < maxTrafficCars) {
+        if (Math.random() < 0.2) { // 20% chance to spawn a bus
+          createBus();
+        } else {
+          createTrafficCar();
+        }
+      }
+      trafficCars.forEach(trafficCar => {
+        if (!trafficCar.userData.hit) {
+          // Auto-correct position back to street if too far off
+          const targetX = trafficCar.position.x < 0 ? -7 : 7;
+          trafficCar.position.x += (targetX - trafficCar.position.x) * 0.1;
+          
+          // Auto-correct rotation
+          const targetRotation = trafficCar.position.x < 0 ? Math.PI : 0;
+          trafficCar.rotation.y += (targetRotation - trafficCar.rotation.y) * 0.1;
+          trafficCar.rotation.x *= 0.9;
+          trafficCar.rotation.z *= 0.9;
+    
+          // Continue normal movement
+          const direction = trafficCar.position.x < 0 ? 1 : -1;
+          trafficCar.position.z += trafficCar.userData.speed * direction;
+          trafficCar.userData.wheels.forEach(wheel => {
+            wheel.rotation.x += trafficCar.userData.speed * 0.1;
+          });
+        }
+      });
+    }
+    
+    const updateSections = () => {
+      const carZ = car.position.z;
+      groundSections.forEach((section, index) => {
+        const sectionZ = section.position.z;
+        const distanceFromCar = carZ - sectionZ;
+        if (distanceFromCar > sectionLength) {
+          section.position.z += sectionLength * numSections;
+          roadSections[index].position.z += sectionLength * numSections;
+          treeSections[index].forEach(tree => scene.remove(tree));
+          treeSections[index] = treesEnabled ? createTreesForSection(section.position.z) : [];
+        } else if (distanceFromCar < -sectionLength * 2) {
+          section.position.z -= sectionLength * numSections;
+          roadSections[index].position.z -= sectionLength * numSections;
+          treeSections[index].forEach(tree => scene.remove(tree));
+          treeSections[index] = treesEnabled ? createTreesForSection(section.position.z) : [];
+        }
+      });
+    };
+    
+    function checkTreeCollisions(carObject, newPosition) {
+      const carBox = new THREE.Box3().setFromObject(carObject);
+      carBox.min.x = newPosition.x - 1;
+      carBox.max.x = newPosition.x + 1;
+      carBox.min.z = newPosition.z - 2;
+      carBox.max.z = newPosition.z + 2;
+      let collision = false;
+      let collisionNormal = new THREE.Vector3();
+      let collisionPoint = new THREE.Vector3();
+      for (const section of treeSections) {
+        for (const tree of section) {
+          tree.userData.collisionBox.setFromObject(tree);
+          if (carBox.intersectsBox(tree.userData.collisionBox)) {
+            collision = true;
+            collisionNormal.x = carObject.position.x - tree.position.x;
+            collisionNormal.z = carObject.position.z - tree.position.z;
+            collisionNormal.normalize();
+            collisionPoint.copy(tree.position);
+            break;
+          }
+        }
+        if (collision) break;
+      }
+      return {
+        collision,
+        collisionNormal,
+        collisionPoint
+      };
+    }
+    function handleCollisions(newPosition) {
+      return checkTreeCollisions(car, newPosition);
+    }
+    window.addEventListener('keydown', e => {
+      if (keys.hasOwnProperty(e.key)) {
+        keys[e.key] = true;
+      }
+    });
+    window.addEventListener('keyup', e => {
+      if (keys.hasOwnProperty(e.key)) {
+        keys[e.key] = false;
+      }
+    });
+    toggleButton.addEventListener('click', () => {
+      trafficEnabled = !trafficEnabled;
+      toggleButton.textContent = `Toggle Traffic: ${trafficEnabled ? 'ON' : 'OFF'}`;
+      if (!trafficEnabled) {
+        trafficCars.forEach(car => {
+          scene.remove(car);
+        });
+        trafficCars.length = 0;
+      }
+    });
+    toggleTreesButton.addEventListener('click', () => {
+      treesEnabled = !treesEnabled;
+      toggleTreesButton.textContent = `Toggle Trees: ${treesEnabled ? 'ON' : 'OFF'}`;
+      if (!treesEnabled) {
+        treeSections.forEach(section => {
+          section.forEach(tree => {
+            scene.remove(tree);
+          });
+        });
+        treeSections.forEach((section, index) => {
+          treeSections[index] = [];
+        });
+      } else {
+        treeSections.forEach((section, index) => {
+          treeSections[index] = createTreesForSection(groundSections[index].position.z);
+        });
+      }
+    });
+    let achievements = {
+      how: false
+    };
+    if (localStorage.getItem('achievements')) {
+      achievements = JSON.parse(localStorage.getItem('achievements'));
+    } else {
+      achievements = {
+        how: false
+      };
+      localStorage.setItem('achievements', JSON.stringify(achievements)); 
+    }
+    function updateAchievementUI() {
+      const howAchievement = document.getElementById('howAchievement');
+      if (achievements.how) {
+        howAchievement.classList.add('unlocked');
+      } else {
+        howAchievement.classList.remove('unlocked');
+      }
+    }
+    document.getElementById('achievementsButton').addEventListener('click', () => {
+      document.getElementById('achievementsUI').style.display = 'block';
+      updateAchievementUI();
+    });
+    document.getElementById('closeAchievements').addEventListener('click', () => {
+      document.getElementById('achievementsUI').style.display = 'none';
+    });
+    document.getElementById('resetAchievements').addEventListener('click', () => {
+      document.getElementById('confirmResetDialog').style.display = 'block';
+    });
+    document.getElementById('confirmReset').addEventListener('click', () => {
+      achievements = {
+        how: false
+      };
+      localStorage.setItem('achievements', JSON.stringify(achievements));
+      updateAchievementUI();
+      document.getElementById('confirmResetDialog').style.display = 'none';
+    });
+    document.getElementById('closeAchievements').addEventListener('click', () => {
+      document.getElementById('achievementsUI').style.display = 'none';
+      document.getElementById('confirmResetDialog').style.display = 'none';
+    });
+    function resetCar() {
+      car.position.set(0, 0.5, 0);
+      speed = 0;
+      velocityX = 0;
+      velocityY = 0;
+      velocityZ = 0;
+      rotation = 0;
+      car.rotation.set(0, 0, 0);
+      car.userData.angularVelocity.set(0, 0, 0);
+      car.userData.inAir = false;
+      camera.position.set(0, 5, -10);
+      camera.lookAt(car.position);
+      isGameOver = false;
+      document.getElementById('respawnUI').style.display = 'none';
+      
+      // Add timer reset
+      achievementTimer = null;
+      startedAchievementTimer = false;
+    }
+    function resetTrafficCar(trafficCar) {
+        trafficCar.userData.hit = false;
+        trafficCar.userData.velocity = new THREE.Vector3();
+        trafficCar.userData.angularVelocity = new THREE.Vector3();
+        trafficCar.position.y = trafficCar.userData.isBus ? 1.25 : 0.5;
+        trafficCar.rotation.set(0, trafficCar.position.x < 0 ? Math.PI : 0, 0);
+    }
+    function createExplosion(position) {
+      for (let i = 0; i < 50; i++) {
+        const geometry = new THREE.SphereGeometry(0.2, 8, 8);
+        const material = new THREE.MeshPhongMaterial({
+          color: Math.random() < 0.3 ? 0xff4400 : 0xff8800,
+          transparent: true
+        });
+        const particle = new THREE.Mesh(geometry, material);
+        particle.position.copy(position);
+        
+        const velocity = new THREE.Vector3(
+          (Math.random() - 0.5) * 2,
+          Math.random() * 2,
+          (Math.random() - 0.5) * 2
+        );
+        
+        particle.userData = {
+          velocity: velocity,
+          lifetime: 60
+        };
+        
+        scene.add(particle);
+        explosionParticles.push(particle);
+      }
+    }
+    function animate() {
+      requestAnimationFrame(animate);
+      updateAchievementUI();
+      if (isGameOver) {
+        speed = 0;
+        velocityX = 0;
+        velocityY = 0;
+        velocityZ = 0;
+      }
+      if (keys.r) {
+        resetCar();
+        keys.r = false;
+      }
+      if (car.position.y > 0.5) {
+        car.userData.inAir = true;
+        velocityY -= gravity;
+      } else {
+        if (car.userData.inAir) {
+          const impactForce = Math.abs(velocityY);
+          if (impactForce > 0.1) {
+            velocityY = impactForce * bounceCoefficient;
+            car.userData.angularVelocity.x = (Math.random() - 0.5) * maxRotationRate * impactForce;
+            car.userData.angularVelocity.z = (Math.random() - 0.5) * maxRotationRate * impactForce;
+            speed *= 0.8;
+            if (impactForce > 0.5) {
+              damagePlayer(impactForce * 5);
+            }
+          } else {
+            velocityY = 0;
+            car.position.y = 0.5;
+          }
+        } else {
+          car.position.y = 0.5;
+          velocityY = 0;
+        }
+        car.userData.angularVelocity.multiplyScalar(groundFriction);
+        car.userData.inAir = false;
+      }
+      if (!car.userData.inAir) {
+        if (keys.ArrowUp || keys.w) {
+          speed = speed + acceleration;
+        }
+        if (keys.ArrowDown || keys.s) {
+          speed = speed - acceleration;
+        }
+        if (keys[' ']) {
+          speed *= 0.95;
+        }
+        if (!keys.ArrowUp && !keys.ArrowDown && !keys.w && !keys.s) {
+          speed *= deceleration;
+        }
+        if (speed !== 0) {
+          if (keys.ArrowLeft || keys.a) {
+            rotation += turnSpeed * (speed > 0 ? 1 : -1);
+          }
+          if (keys.ArrowRight || keys.d) {
+            rotation -= turnSpeed * (speed > 0 ? 1 : -1);
+          }
+        }
+      }
+      velocityX = Math.sin(rotation) * speed * 0.1;
+      velocityZ = Math.cos(rotation) * speed * 0.1;
+      const newPosition = {
+        x: car.position.x + velocityX,
+        y: car.position.y + velocityY,
+        z: car.position.z + velocityZ
+      };
+      const {
+        collision,
+        collisionNormal
+      } = handleCollisions(newPosition);
+      if (collision) {
+        const impactForce = Math.abs(speed);
+        if (impactForce > 10) {
+          velocityY = impactForce * 0.05;
+          car.userData.angularVelocity.x = (Math.random() - 0.5) * maxRotationRate;
+          car.userData.angularVelocity.y = (Math.random() - 0.5) * maxRotationRate;
+          car.userData.angularVelocity.z = (Math.random() - 0.5) * maxRotationRate;
+          damagePlayer(impactForce * 0.5);
+        }
+        const dot = velocityX * collisionNormal.x + velocityZ * collisionNormal.z;
+        velocityX = (velocityX - 2 * dot * collisionNormal.x) * bounceCoefficient;
+        velocityZ = (velocityZ - 2 * dot * collisionNormal.z) * bounceCoefficient;
+        speed *= 0.5;
+      } else {
+        car.position.x += velocityX;
+        car.position.z += velocityZ;
+      }
+      car.position.y += velocityY;
+      car.rotation.x += car.userData.angularVelocity.x;
+      car.rotation.y = rotation;
+      car.rotation.z += car.userData.angularVelocity.z;
+      if (!car.userData.inAir) {
+        car.rotation.x *= 0.95;
+        car.rotation.z *= 0.95;
+      }
+      wheels.forEach(wheel => {
+        wheel.rotation.x += speed * 0.01;
+      });
+      frontWheels.forEach(wheel => {
+        const targetRotation = keys.ArrowLeft || keys.a ? -0.3 : keys.ArrowRight || keys.d ? 0.3 : 0;
+        wheel.rotation.y = targetRotation;
+      });
+      trafficCars.forEach(trafficCar => {
+        const trafficCarBox = new THREE.Box3().setFromObject(trafficCar);
+        const playerBox = new THREE.Box3().setFromObject(car);
+        if (!trafficCar.userData.hit) {
+          const direction = trafficCar.position.x < 0 ? 1 : -1;
+          trafficCar.position.z += trafficCar.userData.speed * direction;
+          trafficCar.userData.wheels.forEach(wheel => {
+            wheel.rotation.x += trafficCar.userData.speed * 0.1;
+          });
+        } else {
+          // Apply physics when hit
+          trafficCar.position.add(trafficCar.userData.velocity);
+          trafficCar.rotation.x += trafficCar.userData.angularVelocity.x;
+          trafficCar.rotation.y += trafficCar.userData.angularVelocity.y;
+          trafficCar.rotation.z += trafficCar.userData.angularVelocity.z;
+          
+          if (trafficCar.position.y > 0.5) {
+            trafficCar.userData.inAir = true;
+            trafficCar.userData.velocity.y -= gravity;
+          } else {
+            if (Math.abs(trafficCar.userData.velocity.length()) < 0.1 && !trafficCar.userData.inAir) {
+                resetTrafficCar(trafficCar);
+            } else {
+                trafficCar.position.y = trafficCar.userData.isBus ? 1.25 : 0.5;
+                trafficCar.userData.velocity.y = 0;
+                trafficCar.userData.velocity.multiplyScalar(0.98);
+                trafficCar.userData.angularVelocity.multiplyScalar(0.98);
+                trafficCar.userData.inAir = false;
+            }
+          }
+        }
+    
+        if (trafficCarBox.intersectsBox(playerBox)) {
+          trafficCar.userData.hit = true;
+    
+          // Calculate impact vector and forces based on collision speed
+          const impactDir = new THREE.Vector3().subVectors(trafficCar.position, car.position).normalize();
+          const impactForce = Math.abs(speed) * 0.02; // Reduced from 0.05
+          
+          // Modify force based on vehicle mass and speed
+          const trafficMass = trafficCar.userData.isBus ? trafficCar.userData.mass : 1;
+          const impactMultiplier = (1 / trafficMass) * (Math.abs(speed) / 40); // Reduced speed impact from /20
+          
+          // Only apply physics if speed is above threshold
+          if (Math.abs(speed) > 5) { // Added minimum speed threshold
+            // Apply forces to traffic vehicle
+            trafficCar.userData.velocity.add(impactDir.multiplyScalar(impactForce * impactMultiplier));
+            trafficCar.userData.velocity.y = impactForce * 0.3 * impactMultiplier; // Reduced from 0.5
+            trafficCar.userData.angularVelocity.set(
+                (Math.random() - 0.5) * maxRotationRate * impactForce * impactMultiplier * 0.5, // Added 0.5 multiplier
+                (Math.random() - 0.5) * maxRotationRate * impactForce * impactMultiplier * 0.5,
+                (Math.random() - 0.5) * maxRotationRate * impactForce * impactMultiplier * 0.5
+            );
+    
+            // Apply increased forces to player when hitting bus
+            const playerForceMultiplier = trafficCar.userData.isBus ? 1.5 : 1;
+            velocityX += -impactDir.x * impactForce * playerForceMultiplier * 0.7; // Added 0.7 multiplier
+            velocityZ += -impactDir.z * impactForce * playerForceMultiplier * 0.7;
+            
+            // Apply damage scaled with impact speed
+            damagePlayer(Math.abs(speed) * (trafficCar.userData.isBus ? 0.4 : 0.3));
+    
+            if (Math.abs(speed) > 20) {
+                velocityY = impactForce;
+                car.userData.angularVelocity.x = (Math.random() - 0.5) * maxRotationRate * 0.7; // Added 0.7 multiplier
+                car.userData.angularVelocity.y = (Math.random() - 0.5) * maxRotationRate * 0.7;
+                car.userData.angularVelocity.z = (Math.random() - 0.5) * maxRotationRate * 0.7;
+                car.userData.inAir = true;
+                speed *= 0.7;
+            }
+    
+            if (Math.abs(speed) > 100) {
+                createExplosion(car.position);
+                createExplosion(trafficCar.position);
+                resetCar();
+                playerHealth = 100;
+                updateHealthBar();
+            }
+          }
+        }
+      });
+      const cameraTargetX = car.position.x - Math.sin(rotation) * 10;
+      const cameraTargetZ = car.position.z - Math.cos(rotation) * 10;
+      const cameraTargetY = car.position.y + 5;
+      camera.position.lerp(new THREE.Vector3(cameraTargetX, cameraTargetY, cameraTargetZ), 0.1);
+      camera.lookAt(car.position);
+      document.getElementById('speedometer').textContent = `Speed: ${Math.abs(Math.round(speed))} MPH`;
+      for (let i = explosionParticles.length - 1; i >= 0; i--) {
+        const particle = explosionParticles[i];
+        particle.position.add(particle.userData.velocity);
+        particle.userData.velocity.y -= 0.05;
+        particle.userData.lifetime--;
+        particle.material.opacity = particle.userData.lifetime / 60;
+        particle.scale.multiplyScalar(0.98);
+        if (particle.userData.lifetime <= 0) {
+          scene.remove(particle);
+          explosionParticles.splice(i, 1);
+        }
+      }
+      updateTrafficCars();
+      updateSections();
+      renderer.render(scene, camera);
+    }
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    const healthText = document.createElement('div');
+    healthText.id = 'healthText';
+    document.getElementById('healthFill').appendChild(healthText);
+    let isGameOver = false;
+    document.getElementById('respawnButton').addEventListener('click', () => {
+      resetCar();
+      playerHealth = 100;
+      updateHealthBar();
+      isGameOver = false;
+      document.getElementById('respawnUI').style.display = 'none';
+    });
+    
+    const toggleUIButton = document.getElementById('toggleUI');
+    const uiElements = [
+        document.getElementById('instructions'),
+        document.getElementById('speedometer'),
+        document.getElementById('toggleTraffic'),
+        document.getElementById('toggleTrees'),
+        document.getElementById('toggleHealth'),
+        document.getElementById('healthBar'),
+        document.getElementById('achievementsButton')
+    ];
+    
+    let uiVisible = true;
+    
+    toggleUIButton.addEventListener('click', () => {
+        uiVisible = !uiVisible;
+        uiElements.forEach(element => {
+            if (element) {
+                element.style.display = uiVisible ? 'block' : 'none';
+            }
+        });
+        
+        // Keep healthBar visibility tied to health system state
+        if (uiVisible && healthSystemEnabled) {
+            healthBar.style.display = 'block';
+        }
+    });
+    
+    animate();
+    </script>
+    </body>
+    </html>
